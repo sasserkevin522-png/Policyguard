@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>PolicyGuard</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f4f8; min-height: 100vh; }
+
+#setup { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.setup-card { background: #fff; border-radius: 16px; padding: 32px 28px; max-width: 460px; width: 100%; box-shadow: 0 4px 24px rgba(0,0,0,0.10); }
+.setup-card h1 { font-size: 22px; font-weight: 700; color: #1a2535; margin-bottom: 4px; }
+.setup-card .sub { font-size: 14px; color: #6b7a90; margin-bottom: 28px; }
+.field-label { font-size: 12px; font-weight: 600; color: #6b7a90; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.field-desc { font-size: 13px; color: #8a96a8; margin-bottom: 8px; line-height: 1.5; }
+.field-input { width: 100%; padding: 12px 14px; border: 1.5px solid #dde3ec; border-radius: 10px; font-size: 14px; font-family: monospace; color: #1a2535; outline: none; margin-bottom: 6px; background: #f8fafc; }
+.field-input:focus { border-color: #3b82f6; background: #fff; }
+.field-status { font-size: 12px; min-height: 18px; margin-bottom: 18px; }
+.btn-primary { width: 100%; padding: 14px; background: #1e5fa8; border: none; border-radius: 10px; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+.btn-primary:disabled { background: #a0b4cc; cursor: default; }
+.setup-note { margin-top: 20px; padding: 12px 14px; background: #f0f6ff; border-radius: 10px; font-size: 12px; color: #5a7a9a; line-height: 1.6; }
+.setup-note a { color: #1e5fa8; }
+
+#app { display: none; min-height: 100vh; flex-direction: column; max-width: 680px; margin: 0 auto; padding: 12px 12px 60px; }
+.app-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #1e5fa8; border-radius: 14px; margin-bottom: 14px; color: #fff; }
+.app-header h1 { font-size: 18px; font-weight: 700; flex: 1; }
+.app-header .sub { font-size: 11px; opacity: 0.7; }
+.settings-btn { background: rgba(255,255,255,0.2); border: none; border-radius: 8px; padding: 6px 10px; color: #fff; font-size: 12px; cursor: pointer; }
+
+.tabs { display: flex; background: #fff; border-radius: 12px; padding: 4px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+.tab { flex: 1; padding: 10px; border: none; background: transparent; border-radius: 9px; font-size: 14px; color: #6b7a90; cursor: pointer; font-weight: 500; }
+.tab.on { background: #1e5fa8; color: #fff; }
+.panel { display: none; } .panel.on { display: block; }
+
+#messages { background: #fff; border-radius: 14px; padding: 14px; min-height: 280px; max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+.bubble { max-width: 86%; padding: 10px 14px; font-size: 14px; line-height: 1.65; white-space: pre-wrap; word-break: break-word; }
+.bubble.bot { align-self: flex-start; background: #f0f4f8; border-radius: 4px 14px 14px 14px; color: #1a2535; }
+.bubble.usr { align-self: flex-end; background: #1e5fa8; color: #fff; border-radius: 14px 4px 14px 14px; }
+.bubble-lbl { font-size: 10px; color: #8a96a8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.07em; }
+
+.input-row { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 6px; }
+#mic-btn { width: 50px; height: 50px; border-radius: 50%; border: none; background: #1e5fa8; color: #fff; font-size: 20px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; touch-action: none; user-select: none; -webkit-user-select: none; transition: background 0.15s; }
+#mic-btn.rec { background: #e74c3c; box-shadow: 0 0 0 4px rgba(231,76,60,0.25); }
+#mic-btn.wait { background: #f0a500; cursor: wait; }
+#mic-btn.nokey { background: #a0b4cc; }
+#q { flex: 1; padding: 12px 14px; border: 1.5px solid #dde3ec; border-radius: 12px; font-size: 15px; resize: none; outline: none; line-height: 1.5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff; color: #1a2535; }
+#q:focus { border-color: #3b82f6; }
+#send-btn { width: 50px; height: 50px; border-radius: 50%; border: none; background: #e0e8f0; color: #8a96a8; font-size: 20px; cursor: default; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+#send-btn.on { background: #1e5fa8; color: #fff; cursor: pointer; }
+#status-bar { font-size: 12px; color: #8a96a8; text-align: center; margin-bottom: 4px; }
+#voice-err { display: none; font-size: 13px; color: #c0392b; background: #fdf0ee; border: 1px solid #f5c6bf; border-radius: 10px; padding: 9px 13px; margin-bottom: 8px; }
+
+.pol-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.pol-tab { flex: 1; padding: 10px; background: #fff; border: 1.5px solid #dde3ec; border-radius: 10px; font-size: 13px; cursor: pointer; color: #6b7a90; font-weight: 500; }
+.pol-tab.on { background: #1e5fa8; color: #fff; border-color: #1e5fa8; }
+#drop { border: 2px dashed #bdc8d8; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; margin-bottom: 10px; background: #f8fafc; transition: all 0.2s; }
+#drop.over { border-color: #1e5fa8; background: #e8f0fb; }
+#drop-txt { font-size: 14px; color: #6b7a90; }
+#drop-sub { font-size: 12px; color: #a0b4cc; margin-top: 4px; }
+#pol-ta { width: 100%; min-height: 240px; padding: 12px 14px; border: 1.5px solid #dde3ec; border-radius: 12px; font-size: 13px; font-family: monospace; line-height: 1.65; resize: vertical; outline: none; background: #fff; color: #1a2535; }
+#pol-ta:focus { border-color: #3b82f6; }
+#upload-err { display: none; font-size: 13px; color: #c0392b; background: #fdf0ee; border: 1px solid #f5c6bf; border-radius: 10px; padding: 9px 13px; margin-bottom: 8px; }
+.pol-hint { font-size: 11px; color: #a0b4cc; text-align: center; margin-top: 8px; }
+
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
+</style>
+</head>
+<body>
+
+<div id="setup">
+  <div class="setup-card">
+    <h1>⚖️ PolicyGuard</h1>
+    <p class="sub">Enter your API keys to get started. Saved to this device only.</p>
+
+    <div class="field-label">Anthropic API Key</div>
+    <div class="field-desc">Get yours at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys.</div>
+    <input id="s-ant" class="field-input" type="password" placeholder="sk-ant-..." autocapitalize="none" autocorrect="off" oninput="checkSetup()"/>
+    <div id="s-ant-status" class="field-status"></div>
+
+    <div class="field-label">Groq API Key <span style="font-weight:400;color:#a0b4cc;">(for voice)</span></div>
+    <div class="field-desc">Free at <a href="https://console.groq.com" target="_blank">console.groq.com</a> → API Keys.</div>
+    <input id="s-grq" class="field-input" type="password" placeholder="gsk_..." autocapitalize="none" autocorrect="off" oninput="checkSetup()"/>
+    <div id="s-grq-status" class="field-status"></div>
+
+    <button class="btn-primary" id="start-btn" onclick="startApp()" disabled>Enter Anthropic key to continue</button>
+    <div class="setup-note">🔒 Keys are saved to this browser only and go directly to the API — nothing else.</div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="app-header">
+    <div><h1>⚖️ PolicyGuard</h1><div class="sub">Compliance Assistant</div></div>
+    <button class="settings-btn" onclick="goSettings()">⚙️ Keys</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" onclick="showTab('ask',this)">💬 Ask</button>
+    <button class="tab" onclick="showTab('pol',this)">📋 Policies</button>
+  </div>
+
+  <div id="ask" class="panel on">
+    <div id="messages"></div>
+    <div id="voice-err"></div>
+    <div class="input-row">
+      <button id="mic-btn" onpointerdown="startRec(event)" onpointerup="stopRec(event)" onpointerleave="stopRec(event)">🎤</button>
+      <textarea id="q" rows="2" placeholder="Type your question or hold mic to speak…" oninput="updSend()"></textarea>
+      <button id="send-btn" onclick="sendQ()">➤</button>
+    </div>
+    <div id="status-bar">Ready</div>
+  </div>
+
+  <div id="pol" class="panel">
+    <div class="pol-tabs">
+      <button class="pol-tab on" onclick="showPol('own',this)">🏢 Our company</button>
+      <button class="pol-tab" onclick="showPol('cust',this)">🤝 Customer</button>
+    </div>
+    <div id="drop" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="onDrop(event)" onclick="document.getElementById('fi').click()">
+      <input id="fi" type="file" accept=".pdf,.docx,.txt" style="display:none" onchange="onFileIn(event)"/>
+      <div id="drop-txt">📄 Tap to upload your policy manual</div>
+      <div id="drop-sub">PDF · DOCX · TXT</div>
+    </div>
+    <div id="upload-err"></div>
+    <textarea id="pol-ta" oninput="polChange()"></textarea>
+    <div class="pol-hint">Upload a file or edit directly — used in all queries immediately</div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script>
+// Use corsproxy.io to bypass Edge local file CORS restriction
+var ANTHROPIC_PROXY = 'https://corsproxy.io/?' + encodeURIComponent('https://api.anthropic.com/v1/messages');
+var GROQ_PROXY = 'https://api.groq.com/openai/v1/audio/transcriptions'; // Groq already allows CORS
+
+var S = {
+  antKey: '', grqKey: '',
+  own: 'COMPANY POLICIES & PROCEDURES\n\n1. CONFIDENTIALITY\nAll employee and client data must be kept strictly confidential. Do not share proprietary information with unauthorized parties.\n\n2. WORKPLACE CONDUCT\nEmployees must maintain professional conduct at all times. Harassment or hostile behavior will not be tolerated.\n\n3. DATA SECURITY\nAll company devices must use approved security software. Never store sensitive data on personal devices.\n\n4. EXPENSE REPORTING\nAll expenses over $50 must be pre-approved by a manager. Receipts are required for all reimbursements.\n\n5. CONFLICT OF INTEREST\nEmployees must disclose any personal relationships that could influence business decisions.\n\n6. REMOTE WORK\nEmployees working remotely must use a VPN at all times.',
+  cust: 'CUSTOMER POLICY MANUAL\n\n1. ON-SITE REQUIREMENTS\nAll contractors must sign in and wear a visible badge at all times.\n\n2. PHOTOGRAPHY & RECORDING\nNo photos or recordings may be taken on customer property without written consent.\n\n3. SYSTEM ACCESS\nContractors may only access systems authorized in the current Statement of Work.\n\n4. COMMUNICATION PROTOCOL\nAll scope changes must go through the designated customer project manager.\n\n5. SAFETY REQUIREMENTS\nHard hats and safety vests are required in all warehouse and production areas.\n\n6. INTELLECTUAL PROPERTY\nAll work product created on-site becomes the property of the customer.',
+  polTab: 'own', micState: 'idle', recSecs: 0, recorder: null, chunks: [], timer: null
+};
+
+(function(){
+  try {
+    var ak = localStorage.getItem('pg4_ant');
+    var gk = localStorage.getItem('pg4_grq');
+    if (ak) { S.antKey = ak; document.getElementById('s-ant').value = ak; }
+    if (gk) { S.grqKey = gk; document.getElementById('s-grq').value = gk; }
+    checkSetup();
+    if (ak) startApp();
+  } catch(e) {}
+})();
+
+function checkSetup() {
+  var ak = document.getElementById('s-ant').value.trim();
+  var gk = document.getElementById('s-grq').value.trim();
+  var as = document.getElementById('s-ant-status');
+  var gs = document.getElementById('s-grq-status');
+  var btn = document.getElementById('start-btn');
+  if (!ak) { as.textContent = ''; }
+  else if (ak.startsWith('sk-')) { as.style.color='#27ae60'; as.textContent='✓ Key looks good'; }
+  else { as.style.color='#e74c3c'; as.textContent='Should start with sk-ant-...'; }
+  if (!gk) { gs.textContent = ''; }
+  else if (gk.startsWith('gsk_')) { gs.style.color='#27ae60'; gs.textContent='✓ Voice enabled'; }
+  else { gs.style.color='#e74c3c'; gs.textContent='Should start with gsk_'; }
+  if (ak && ak.startsWith('sk-')) { btn.disabled=false; btn.textContent='Launch PolicyGuard →'; }
+  else { btn.disabled=true; btn.textContent='Enter Anthropic key to continue'; }
+}
+
+function startApp() {
+  var ak = document.getElementById('s-ant').value.trim();
+  var gk = document.getElementById('s-grq').value.trim();
+  if (!ak) return;
+  S.antKey = ak; S.grqKey = gk;
+  try { localStorage.setItem('pg4_ant', ak); if(gk) localStorage.setItem('pg4_grq', gk); } catch(e) {}
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('pol-ta').value = S.own;
+  updMic();
+  addBot('Hello! I\'m your Policy Assistant. Ask me anything about your company or customer policies.\n\n' + (S.grqKey ? '🎤 Hold the mic button to speak.' : '🎤 Add a Groq key via ⚙️ Keys to enable voice.'));
+}
+
+function goSettings() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('setup').style.display = 'flex';
+}
+
+function showTab(id, btn) {
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on'); document.getElementById(id).classList.add('on');
+}
+
+function showPol(id, btn) {
+  S.polTab = id;
+  document.querySelectorAll('.pol-tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('pol-ta').value = S[id];
+}
+function polChange() { S[S.polTab] = document.getElementById('pol-ta').value; }
+
+function addBot(txt) {
+  var m = document.getElementById('messages');
+  var w = document.createElement('div'); w.className = 'bubble bot';
+  var l = document.createElement('div'); l.className = 'bubble-lbl'; l.textContent = '⚖️ PolicyGuard';
+  var t = document.createElement('div'); t.textContent = txt;
+  w.appendChild(l); w.appendChild(t); m.appendChild(w); m.scrollTop = m.scrollHeight;
+}
+function addUsr(txt) {
+  var m = document.getElementById('messages');
+  var b = document.createElement('div'); b.className = 'bubble usr'; b.textContent = txt;
+  m.appendChild(b); m.scrollTop = m.scrollHeight;
+}
+function addThinking() {
+  var m = document.getElementById('messages');
+  var b = document.createElement('div'); b.className = 'bubble bot'; b.id = 'thinking';
+  var l = document.createElement('div'); l.className = 'bubble-lbl'; l.textContent = '⚖️ PolicyGuard';
+  var t = document.createElement('div'); t.textContent = 'Reviewing policies…'; t.style.animation = 'pulse 1.2s infinite'; t.style.color = '#8a96a8';
+  b.appendChild(l); b.appendChild(t); m.appendChild(b); m.scrollTop = m.scrollHeight;
+}
+function removeThinking() { var t = document.getElementById('thinking'); if(t) t.remove(); }
+
+function updSend() {
+  var s = document.getElementById('send-btn');
+  document.getElementById('q').value.trim() ? s.classList.add('on') : s.classList.remove('on');
+}
+function setVoiceErr(msg) {
+  var el = document.getElementById('voice-err');
+  if (msg) { el.textContent = msg; el.style.display = 'block'; }
+  else { el.style.display = 'none'; }
+}
+function updStatus() {
+  var el = document.getElementById('status-bar');
+  if (S.micState === 'recording') el.textContent = '🔴 Recording ' + S.recSecs + 's — release to transcribe';
+  else if (S.micState === 'transcribing') el.textContent = '⏳ Transcribing…';
+  else if (S.grqKey) el.textContent = 'Hold mic to speak · Enter to send';
+  else el.textContent = 'Ready — type your question and tap ➤';
+}
+
+document.getElementById('q').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendQ(); }
+});
+
+async function callAnthropic(body) {
+  // Try direct first, fall back to proxy if blocked
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': S.antKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-allow-browser': 'true' },
+      body: JSON.stringify(body)
+    });
+    if (res.ok || res.status < 500) return await res.json();
+    throw new Error('Direct failed');
+  } catch(e) {
+    // Fall back to corsproxy
+    var res2 = await fetch(ANTHROPIC_PROXY, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': S.antKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-allow-browser': 'true' },
+      body: JSON.stringify(body)
+    });
+    return await res2.json();
+  }
+}
+
+async function sendQ() {
+  var q = document.getElementById('q').value.trim();
+  if (!q || !S.antKey) return;
+  addUsr(q);
+  document.getElementById('q').value = '';
+  updSend(); setVoiceErr('');
+  addThinking();
+  try {
+    var data = await callAnthropic({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: 'You are a compliance and policy assistant.\n\n== OWN COMPANY POLICY ==\n' + S.own + '\n\n== CUSTOMER POLICY ==\n' + S.cust + '\n\nWhen answering: identify which policy applies, cite the section by number, give a clear plain-English verdict (Allowed / Prohibited / Requires Approval). Be concise. If not covered, say so.',
+      messages: [{ role: 'user', content: q }]
+    });
+    removeThinking();
+    if (data.error) addBot('Error: ' + data.error.message);
+    else addBot((data.content || []).map(b => b.text || '').join('') || 'No response.');
+  } catch(err) {
+    removeThinking();
+    addBot('Connection error: ' + err.message);
+  }
+  updStatus();
+}
+
+async function startRec(e) {
+  e.preventDefault();
+  if (S.micState !== 'idle') return;
+  if (!S.grqKey) { setVoiceErr('No Groq key — tap ⚙️ Keys to add one for voice.'); return; }
+  setVoiceErr('');
+  try {
+    var stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    S.chunks = [];
+    var mime = MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4'
+      : MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm';
+    var rec = new MediaRecorder(stream, { mimeType: mime });
+    rec.ondataavailable = function(ev) { if (ev.data.size > 0) S.chunks.push(ev.data); };
+    rec.onstop = async function() {
+      stream.getTracks().forEach(t => t.stop());
+      clearInterval(S.timer);
+      S.micState = 'transcribing'; updMic(); updStatus();
+      try {
+        var blob = new Blob(S.chunks, { type: mime });
+        var txt = await transcribe(blob, mime);
+        document.getElementById('q').value = txt.trim();
+        updSend();
+      } catch(err) { setVoiceErr('Transcription failed: ' + err.message); }
+      S.micState = 'idle'; updMic(); updStatus();
+    };
+    rec.start(100);
+    S.recorder = rec; S.micState = 'recording'; S.recSecs = 0;
+    S.timer = setInterval(function() { S.recSecs++; updStatus(); }, 1000);
+    updMic(); updStatus();
+  } catch(err) {
+    setVoiceErr('Microphone access denied. Click the lock icon in the address bar → Microphone → Allow, then refresh.');
+  }
+}
+function stopRec(e) {
+  e.preventDefault();
+  if (S.micState !== 'recording') return;
+  if (S.recorder && S.recorder.state !== 'inactive') S.recorder.stop();
+}
+function updMic() {
+  var b = document.getElementById('mic-btn');
+  b.className = '';
+  if (S.micState === 'recording') { b.textContent = '⏹'; b.className = 'rec'; }
+  else if (S.micState === 'transcribing') { b.textContent = '⏳'; b.className = 'wait'; }
+  else if (!S.grqKey) { b.textContent = '🎤'; b.className = 'nokey'; }
+  else { b.textContent = '🎤'; }
+  b.id = 'mic-btn';
+}
+async function transcribe(blob, mime) {
+  var ext = mime.includes('mp4') ? 'audio.mp4' : mime.includes('webm') ? 'audio.webm' : 'audio.m4a';
+  var fd = new FormData();
+  fd.append('file', blob, ext);
+  fd.append('model', 'whisper-large-v3-turbo');
+  fd.append('language', 'en');
+  var res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+    method: 'POST', headers: { 'Authorization': 'Bearer ' + S.grqKey }, body: fd
+  });
+  if (!res.ok) { var e = await res.json().catch(()=>({})); throw new Error(e?.error?.message || 'HTTP ' + res.status); }
+  return (await res.json()).text || '';
+}
+
+function onDrop(e) { e.preventDefault(); document.getElementById('drop').classList.remove('over'); handleFile(e.dataTransfer.files[0]); }
+function onFileIn(e) { handleFile(e.target.files[0]); e.target.value = ''; }
+async function handleFile(file) {
+  if (!file) return;
+  var n = file.name.toLowerCase();
+  if (!n.endsWith('.pdf') && !n.endsWith('.docx') && !n.endsWith('.txt')) { showUpErr('Please upload a PDF, DOCX, or TXT file.'); return; }
+  document.getElementById('upload-err').style.display = 'none';
+  document.getElementById('drop-txt').textContent = '⏳ Extracting text…';
+  document.getElementById('drop-sub').textContent = '';
+  try {
+    var txt = '';
+    if (n.endsWith('.pdf')) txt = await exPDF(file);
+    else if (n.endsWith('.docx')) txt = await exDocx(file);
+    else txt = await exTxt(file);
+    S[S.polTab] = txt;
+    document.getElementById('pol-ta').value = txt;
+    document.getElementById('drop-txt').textContent = '✅ ' + file.name;
+    document.getElementById('drop-sub').textContent = 'Tap to replace';
+  } catch(err) {
+    showUpErr('Failed: ' + err.message);
+    document.getElementById('drop-txt').textContent = '📄 Tap to upload your policy manual';
+    document.getElementById('drop-sub').textContent = 'PDF · DOCX · TXT';
+  }
+}
+function showUpErr(m) { var e = document.getElementById('upload-err'); e.textContent = '⚠️ ' + m; e.style.display = 'block'; }
+
+async function exPDF(file) {
+  return new Promise(function(res, rej) {
+    var r = new FileReader();
+    r.onload = async function(e) {
+      try {
+        var b64 = e.target.result.split(',')[1];
+        var data = await callAnthropic({ model: 'claude-sonnet-4-20250514', max_tokens: 4000, messages: [{ role: 'user', content: [{ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } }, { type: 'text', text: 'Extract all text from this policy document. Return only raw text preserving structure. No commentary.' }] }] });
+        res((data.content || []).map(b => b.text || '').join(''));
+      } catch(err) { rej(err); }
+    };
+    r.onerror = rej; r.readAsDataURL(file);
+  });
+}
+async function exDocx(file) {
+  return new Promise(function(res, rej) {
+    var r = new FileReader();
+    r.onload = async function(e) { try { var result = await mammoth.extractRawText({ arrayBuffer: e.target.result }); res(result.value); } catch(err) { rej(err); } };
+    r.onerror = rej; r.readAsArrayBuffer(file);
+  });
+}
+async function exTxt(file) {
+  return new Promise(function(res, rej) { var r = new FileReader(); r.onload = e => res(e.target.result); r.onerror = rej; r.readAsText(file); });
+}
+</script>
+</body>
+</html>
