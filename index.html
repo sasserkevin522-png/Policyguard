@@ -29,35 +29,16 @@
       position: absolute; top: 0; left: 0;
       width: 100%; height: 100%; opacity: 0.10;
     }
-    .pg-logo-row {
-      display: flex; align-items: center; gap: 12px;
-      position: relative; z-index: 1;
-    }
+    .pg-logo-row { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
     .pg-title { font-size: 26px; font-weight: 700; color: #E6F1FB; letter-spacing: 1px; }
     .pg-subtitle { font-size: 12px; color: #85B7EB; margin-top: 2px; }
-    .pg-status {
-      display: flex; align-items: center; gap: 6px;
-      margin-top: 14px; position: relative; z-index: 1;
-    }
-    .pg-status-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: #5DCAA5; animation: pulse 2s infinite;
-    }
+    .pg-status { display: flex; align-items: center; gap: 6px; margin-top: 14px; position: relative; z-index: 1; }
+    .pg-status-dot { width: 8px; height: 8px; border-radius: 50%; background: #5DCAA5; animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
     .pg-status-text { font-size: 12px; color: #9FE1CB; }
-    .pg-body {
-      width: 100%; max-width: 480px;
-      padding: 1.25rem 1rem;
-      display: flex; flex-direction: column; gap: 1.25rem;
-    }
-    .pg-card {
-      background: #0f2040; border-radius: 14px;
-      border: 1px solid #1a3a5c; padding: 1rem 1.1rem;
-    }
-    .pg-section-label {
-      font-size: 10px; font-weight: 600; color: #85B7EB;
-      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
-    }
+    .pg-body { width: 100%; max-width: 480px; padding: 1.25rem 1rem; display: flex; flex-direction: column; gap: 1.25rem; }
+    .pg-card { background: #0f2040; border-radius: 14px; border: 1px solid #1a3a5c; padding: 1rem 1.1rem; }
+    .pg-section-label { font-size: 10px; font-weight: 600; color: #85B7EB; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
     .pg-customer-select {
       width: 100%; padding: 11px 14px; border-radius: 10px;
       border: 1px solid #1a3a5c; background: #0a1628;
@@ -67,70 +48,40 @@
     }
     .pg-customer-select option { background: #0a1628; color: #E6F1FB; }
     .pg-manuals { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .pg-manual-card {
-      background: #0a1628; border-radius: 10px;
-      border: 1px solid #1a3a5c; padding: 12px 10px;
-      display: flex; flex-direction: column; gap: 8px;
-    }
+    .pg-manual-card { background: #0a1628; border-radius: 10px; border: 1px solid #1a3a5c; padding: 12px 10px; display: flex; flex-direction: column; gap: 8px; }
     .pg-manual-card.loaded { border-color: #1D9E75; background: #071a12; }
-    .pg-manual-title {
-      font-size: 12px; font-weight: 600; color: #85B7EB;
-      display: flex; align-items: center; gap: 6px;
-    }
+    .pg-manual-title { font-size: 12px; font-weight: 600; color: #85B7EB; display: flex; align-items: center; gap: 6px; }
     .pg-manual-status { font-size: 11px; color: #4a6a8a; line-height: 1.4; }
     .pg-manual-card.loaded .pg-manual-status { color: #5DCAA5; }
     .pg-progress { display: none; height: 4px; background: #1a3a5c; border-radius: 2px; overflow: hidden; }
     .pg-progress-bar { height: 100%; background: #5DCAA5; border-radius: 2px; transition: width 0.2s; width: 0%; }
-    .pg-upload-btn {
-      width: 100%; padding: 8px; border-radius: 8px;
-      background: transparent; border: 1px solid #1a3a5c;
-      color: #85B7EB; font-size: 12px; font-family: inherit;
-      cursor: pointer; text-align: center;
-    }
+    .pg-upload-btn { width: 100%; padding: 8px; border-radius: 8px; background: transparent; border: 1px solid #1a3a5c; color: #85B7EB; font-size: 12px; font-family: inherit; cursor: pointer; text-align: center; }
     .pg-upload-btn:active { background: #0C447C; }
     .pg-upload-input { display: none; }
     .pg-search-input-row { display: flex; align-items: center; gap: 8px; }
-    .pg-search-input {
-      flex: 1; background: #0a1628; border: 1px solid #1a3a5c;
-      border-radius: 10px; padding: 11px 14px;
-      color: #E6F1FB; font-size: 15px; font-family: inherit; outline: none;
-    }
+    .pg-search-input { flex: 1; background: #0a1628; border: 1px solid #1a3a5c; border-radius: 10px; padding: 11px 14px; color: #E6F1FB; font-size: 15px; font-family: inherit; outline: none; }
     .pg-search-input::placeholder { color: #4a6a8a; }
     .pg-search-input:focus { border-color: #378ADD; }
-    .pg-mic-btn {
-      width: 44px; height: 44px; border-radius: 50%;
-      background: #185FA5; border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
+    .pg-mic-btn { width: 44px; height: 44px; border-radius: 50%; background: #185FA5; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .pg-mic-btn:active { background: #0C447C; transform: scale(0.95); }
     .pg-mic-btn.listening { background: #c0392b; animation: micpulse 1s infinite; }
-    @keyframes micpulse {
-      0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,0.5)}
-      50%{box-shadow:0 0 0 8px rgba(192,57,43,0)}
-    }
-    .pg-search-btn {
-      width: 100%; padding: 13px; border-radius: 10px;
-      background: #185FA5; color: #E6F1FB; border: none;
-      font-size: 15px; font-weight: 600; font-family: inherit;
-      cursor: pointer; margin-top: 10px;
-    }
+    @keyframes micpulse { 0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,0.5)} 50%{box-shadow:0 0 0 8px rgba(192,57,43,0)} }
+    .pg-search-btn { width: 100%; padding: 13px; border-radius: 10px; background: #185FA5; color: #E6F1FB; border: none; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; margin-top: 10px; }
     .pg-search-btn:active { background: #0C447C; }
-    .pg-result-area {
-      background: #0a1628; border-radius: 10px;
-      border: 1px solid #1a3a5c; padding: 16px; min-height: 100px;
-    }
+    .pg-search-btn:disabled { background: #1a3a5c; color: #4a6a8a; cursor: not-allowed; }
+    .pg-result-area { background: #0a1628; border-radius: 10px; border: 1px solid #1a3a5c; padding: 16px; min-height: 100px; }
     .pg-result-placeholder { font-size: 13px; color: #4a6a8a; text-align: center; padding: 1rem 0; }
     .pg-result-content { font-size: 14px; color: #E6F1FB; line-height: 1.7; }
-    .pg-result-tag {
-      display: inline-block; font-size: 10px; font-weight: 600;
-      padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; letter-spacing: 0.5px;
-    }
+    .pg-result-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; letter-spacing: 0.5px; }
     .tag-company { background: #0C447C; color: #85B7EB; }
     .tag-customer { background: #085041; color: #5DCAA5; }
-    .pg-footer {
-      width: 100%; max-width: 480px; padding: 0 1rem;
-      display: flex; justify-content: space-between; margin-top: 0.5rem;
-    }
+    .tag-ai { background: #3d1f6e; color: #c4a3f5; }
+    .pg-speak-btn { width: 100%; padding: 11px; border-radius: 10px; background: transparent; border: 1px solid #1D9E75; color: #5DCAA5; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; margin-top: 12px; display: none; }
+    .pg-speak-btn:active { background: #071a12; }
+    .pg-speak-btn.speaking { background: #071a12; border-color: #c0392b; color: #e74c3c; }
+    .pg-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #1a3a5c; border-top-color: #85B7EB; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 6px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .pg-footer { width: 100%; max-width: 480px; padding: 0 1rem; display: flex; justify-content: space-between; margin-top: 0.5rem; }
     .pg-footer-text { font-size: 11px; color: #2a4a6a; }
   </style>
 </head>
@@ -241,7 +192,7 @@
     <div class="pg-card">
       <div class="pg-section-label">Policy search</div>
       <div class="pg-search-input-row">
-        <input class="pg-search-input" type="text" id="searchInput" placeholder='Try "grounding" or "lockout"' />
+        <input class="pg-search-input" type="text" id="searchInput" placeholder='Try "grounding" or "two phase"' />
         <button class="pg-mic-btn" id="micBtn" title="Tap to speak">
           <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
             <rect x="5" y="1" width="6" height="8" rx="3" fill="#E6F1FB"/>
@@ -259,13 +210,14 @@
         <div class="pg-result-placeholder" id="resultPlaceholder">Upload a manual and enter a search term</div>
         <div class="pg-result-content" id="resultContent" style="display:none;"></div>
       </div>
+      <button class="pg-speak-btn" id="speakBtn">&#9654; Read aloud</button>
     </div>
 
   </div>
 
   <div class="pg-footer">
     <div class="pg-footer-text">PolicyGuard — Field Edition v1.0</div>
-    <div class="pg-footer-text">Stage 2</div>
+    <div class="pg-footer-text">Stage 3</div>
   </div>
 
   <script>
@@ -273,6 +225,8 @@
 
     let companyText = '';
     let customerText = '';
+    let lastAIResponse = '';
+    let isSpeaking = false;
 
     async function extractPDF(file, statusEl, cardEl, progressEl, progressBarEl) {
       statusEl.textContent = 'Reading...';
@@ -349,45 +303,147 @@
 
     function getChunks(text, keyword, max) {
       if (!text) return [];
-      const lower = keyword.toLowerCase();
+      const words = keyword.toLowerCase().split(/\s+/);
       const sentences = text.split(/[.!?\n]+/);
       const results = [];
       for (let i = 0; i < sentences.length; i++) {
-        if (sentences[i].toLowerCase().includes(lower)) {
+        const lower = sentences[i].toLowerCase();
+        if (words.some(w => w.length > 2 && lower.includes(w))) {
           const chunk = [sentences[i-1]||'', sentences[i], sentences[i+1]||''].join(' ').trim();
-          if (chunk.length > 20) results.push(chunk);
+          if (chunk.length > 30) results.push(chunk);
           if (results.length >= max) break;
         }
       }
       return results;
     }
 
-    document.getElementById('searchBtn').addEventListener('click', function() {
+    async function callAI(query, companyChunks, customerChunks) {
+      let context = '';
+      if (companyChunks.length) {
+        context += 'COMPANY POLICY MANUAL EXCERPTS:\n' + companyChunks.join('\n\n') + '\n\n';
+      }
+      if (customerChunks.length) {
+        context += 'CUSTOMER POLICY MANUAL EXCERPTS:\n' + customerChunks.join('\n\n') + '\n\n';
+      }
+
+      const prompt = `You are a field safety policy assistant for powerline crews. A crew leader has searched for: "${query}"
+
+Based on the following policy manual excerpts, provide a clear, plain-English explanation of the relevant safety policy. Be direct and practical - this person is in the field and needs to understand what the policy requires. If both company and customer policies are provided, explain both and note any important differences. Keep your response concise and actionable.
+
+${context}
+
+If the excerpts don't contain enough information to fully answer the question, say so clearly and explain what was found.`;
+
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+
+      const data = await response.json();
+      if (data.content && data.content[0]) {
+        return data.content[0].text;
+      }
+      throw new Error('No response from AI');
+    }
+
+    document.getElementById('searchBtn').addEventListener('click', async function() {
       const query = searchInput.value.trim();
       if (!query) { alert('Please enter a search term.'); return; }
       if (!companyText && !customerText) { alert('Please upload at least one policy manual first.'); return; }
 
-      const companyChunks = getChunks(companyText, query, 5);
-      const customerChunks = getChunks(customerText, query, 5);
-
+      const btn = document.getElementById('searchBtn');
       const placeholder = document.getElementById('resultPlaceholder');
       const content = document.getElementById('resultContent');
+      const speakBtn = document.getElementById('speakBtn');
+      const statusText = document.getElementById('statusText');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="pg-spinner"></span>Searching...';
       placeholder.style.display = 'none';
       content.style.display = 'block';
+      content.innerHTML = '<p style="color:#85B7EB;font-size:13px;"><span class="pg-spinner"></span>Finding relevant policies...</p>';
+      speakBtn.style.display = 'none';
+      statusText.textContent = 'Searching...';
 
-      let html = '';
-      if (companyChunks.length) {
-        html += '<div style="margin-bottom:14px;"><span class="pg-result-tag tag-company">COMPANY MANUAL</span><p style="color:#c8dff5;font-size:13px;line-height:1.7;">' + companyChunks.join('<br><br>') + '</p></div>';
-      }
-      if (customerChunks.length) {
-        html += '<div style="margin-bottom:14px;"><span class="pg-result-tag tag-customer">CUSTOMER MANUAL</span><p style="color:#c8dff5;font-size:13px;line-height:1.7;">' + customerChunks.join('<br><br>') + '</p></div>';
-      }
+      const companyChunks = getChunks(companyText, query, 8);
+      const customerChunks = getChunks(customerText, query, 8);
+
       if (!companyChunks.length && !customerChunks.length) {
-        html = '<p style="color:#4a6a8a;font-size:13px;">No results found for "' + query + '". Try a different keyword.</p>';
+        content.innerHTML = '<p style="color:#4a6a8a;font-size:13px;">No relevant policy found for "' + query + '". Try different keywords.</p>';
+        btn.disabled = false;
+        btn.innerHTML = 'Search policies';
+        statusText.textContent = 'No results found';
+        return;
       }
 
-      content.innerHTML = html;
-      document.getElementById('statusText').textContent = 'Search complete';
+      content.innerHTML = '<p style="color:#85B7EB;font-size:13px;"><span class="pg-spinner"></span>Analyzing policies with AI...</p>';
+      statusText.textContent = 'AI analyzing...';
+
+      try {
+        const aiResponse = await callAI(query, companyChunks, customerChunks);
+        lastAIResponse = aiResponse;
+
+        let html = '<span class="pg-result-tag tag-ai">AI POLICY SUMMARY</span>';
+
+        if (companyChunks.length && customerChunks.length) {
+          html += '<span class="pg-result-tag tag-company" style="margin-left:6px;">COMPANY</span>';
+          html += '<span class="pg-result-tag tag-customer" style="margin-left:6px;">CUSTOMER</span>';
+        } else if (companyChunks.length) {
+          html += '<span class="pg-result-tag tag-company" style="margin-left:6px;">COMPANY MANUAL</span>';
+        } else {
+          html += '<span class="pg-result-tag tag-customer" style="margin-left:6px;">CUSTOMER MANUAL</span>';
+        }
+
+        html += '<p style="color:#e8f0fe;font-size:14px;line-height:1.8;margin-top:10px;">' + aiResponse.replace(/\n/g, '<br>') + '</p>';
+        content.innerHTML = html;
+        speakBtn.style.display = 'block';
+        statusText.textContent = 'Policy found';
+      } catch(e) {
+        content.innerHTML = '<p style="color:#e74c3c;font-size:13px;">AI connection error. Showing raw results below.</p>';
+        let html = '';
+        if (companyChunks.length) {
+          html += '<span class="pg-result-tag tag-company">COMPANY MANUAL</span><p style="color:#c8dff5;font-size:13px;line-height:1.7;margin-top:8px;">' + companyChunks.join('<br><br>') + '</p>';
+        }
+        if (customerChunks.length) {
+          html += '<span class="pg-result-tag tag-customer" style="margin-top:10px;display:inline-block;">CUSTOMER MANUAL</span><p style="color:#c8dff5;font-size:13px;line-height:1.7;margin-top:8px;">' + customerChunks.join('<br><br>') + '</p>';
+        }
+        content.innerHTML += html;
+        statusText.textContent = 'AI unavailable';
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = 'Search policies';
+    });
+
+    const speakBtn = document.getElementById('speakBtn');
+
+    speakBtn.addEventListener('click', function() {
+      if (isSpeaking) {
+        window.speechSynthesis.cancel();
+        isSpeaking = false;
+        speakBtn.classList.remove('speaking');
+        speakBtn.innerHTML = '&#9654; Read aloud';
+        return;
+      }
+      if (!lastAIResponse) return;
+      const utterance = new SpeechSynthesisUtterance(lastAIResponse);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.95;
+      utterance.pitch = 1;
+      utterance.onend = function() {
+        isSpeaking = false;
+        speakBtn.classList.remove('speaking');
+        speakBtn.innerHTML = '&#9654; Read aloud';
+      };
+      isSpeaking = true;
+      speakBtn.classList.add('speaking');
+      speakBtn.innerHTML = '&#9646;&#9646; Stop reading';
+      window.speechSynthesis.speak(utterance);
     });
   </script>
 
