@@ -223,6 +223,8 @@
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+    const API_KEY = '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';
+
     let companyText = '';
     let customerText = '';
     let lastAIResponse = '';
@@ -319,12 +321,8 @@
 
     async function callAI(query, companyChunks, customerChunks) {
       let context = '';
-      if (companyChunks.length) {
-        context += 'COMPANY POLICY MANUAL EXCERPTS:\n' + companyChunks.join('\n\n') + '\n\n';
-      }
-      if (customerChunks.length) {
-        context += 'CUSTOMER POLICY MANUAL EXCERPTS:\n' + customerChunks.join('\n\n') + '\n\n';
-      }
+      if (companyChunks.length) context += 'COMPANY POLICY MANUAL EXCERPTS:\n' + companyChunks.join('\n\n') + '\n\n';
+      if (customerChunks.length) context += 'CUSTOMER POLICY MANUAL EXCERPTS:\n' + customerChunks.join('\n\n') + '\n\n';
 
       const prompt = `You are a field safety policy assistant for powerline crews. A crew leader has searched for: "${query}"
 
@@ -336,7 +334,12 @@ If the excerpts don't contain enough information to fully answer the question, s
 
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': API_KEY,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1000,
@@ -345,10 +348,8 @@ If the excerpts don't contain enough information to fully answer the question, s
       });
 
       const data = await response.json();
-      if (data.content && data.content[0]) {
-        return data.content[0].text;
-      }
-      throw new Error('No response from AI');
+      if (data.content && data.content[0]) return data.content[0].text;
+      throw new Error('No response');
     }
 
     document.getElementById('searchBtn').addEventListener('click', async function() {
@@ -381,7 +382,7 @@ If the excerpts don't contain enough information to fully answer the question, s
         return;
       }
 
-      content.innerHTML = '<p style="color:#85B7EB;font-size:13px;"><span class="pg-spinner"></span>Analyzing policies with AI...</p>';
+      content.innerHTML = '<p style="color:#85B7EB;font-size:13px;"><span class="pg-spinner"></span>AI analyzing policies...</p>';
       statusText.textContent = 'AI analyzing...';
 
       try {
@@ -389,7 +390,6 @@ If the excerpts don't contain enough information to fully answer the question, s
         lastAIResponse = aiResponse;
 
         let html = '<span class="pg-result-tag tag-ai">AI POLICY SUMMARY</span>';
-
         if (companyChunks.length && customerChunks.length) {
           html += '<span class="pg-result-tag tag-company" style="margin-left:6px;">COMPANY</span>';
           html += '<span class="pg-result-tag tag-customer" style="margin-left:6px;">CUSTOMER</span>';
@@ -398,20 +398,15 @@ If the excerpts don't contain enough information to fully answer the question, s
         } else {
           html += '<span class="pg-result-tag tag-customer" style="margin-left:6px;">CUSTOMER MANUAL</span>';
         }
-
         html += '<p style="color:#e8f0fe;font-size:14px;line-height:1.8;margin-top:10px;">' + aiResponse.replace(/\n/g, '<br>') + '</p>';
         content.innerHTML = html;
         speakBtn.style.display = 'block';
         statusText.textContent = 'Policy found';
       } catch(e) {
-        content.innerHTML = '<p style="color:#e74c3c;font-size:13px;">AI connection error. Showing raw results below.</p>';
+        content.innerHTML = '<p style="color:#e74c3c;font-size:13px;">AI connection error. Showing raw results.</p>';
         let html = '';
-        if (companyChunks.length) {
-          html += '<span class="pg-result-tag tag-company">COMPANY MANUAL</span><p style="color:#c8dff5;font-size:13px;line-height:1.7;margin-top:8px;">' + companyChunks.join('<br><br>') + '</p>';
-        }
-        if (customerChunks.length) {
-          html += '<span class="pg-result-tag tag-customer" style="margin-top:10px;display:inline-block;">CUSTOMER MANUAL</span><p style="color:#c8dff5;font-size:13px;line-height:1.7;margin-top:8px;">' + customerChunks.join('<br><br>') + '</p>';
-        }
+        if (companyChunks.length) html += '<span class="pg-result-tag tag-company">COMPANY MANUAL</span><p style="color:#c8dff5;font-size:13px;line-height:1.7;margin-top:8px;">' + companyChunks.join('<br><br>') + '</p>';
+        if (customerChunks.length) html += '<span class="pg-result-tag tag-customer" style="margin-top:10px;display:inline-block;">CUSTOMER MANUAL</span><p style="color:#c8dff5;font-size:13px;line-height:1.7;margin-top:8px;">' + customerChunks.join('<br><br>') + '</p>';
         content.innerHTML += html;
         statusText.textContent = 'AI unavailable';
       }
@@ -421,7 +416,6 @@ If the excerpts don't contain enough information to fully answer the question, s
     });
 
     const speakBtn = document.getElementById('speakBtn');
-
     speakBtn.addEventListener('click', function() {
       if (isSpeaking) {
         window.speechSynthesis.cancel();
