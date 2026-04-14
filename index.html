@@ -1,398 +1,489 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<title>PolicyGuard</title>
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f4f8; min-height: 100vh; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>PolicyGuard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-#setup { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.setup-card { background: #fff; border-radius: 16px; padding: 32px 28px; max-width: 460px; width: 100%; box-shadow: 0 4px 24px rgba(0,0,0,0.10); }
-.setup-card h1 { font-size: 22px; font-weight: 700; color: #1a2535; margin-bottom: 4px; }
-.setup-card .sub { font-size: 14px; color: #6b7a90; margin-bottom: 28px; }
-.field-label { font-size: 12px; font-weight: 600; color: #6b7a90; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
-.field-desc { font-size: 13px; color: #8a96a8; margin-bottom: 8px; line-height: 1.5; }
-.field-input { width: 100%; padding: 12px 14px; border: 1.5px solid #dde3ec; border-radius: 10px; font-size: 14px; font-family: monospace; color: #1a2535; outline: none; margin-bottom: 6px; background: #f8fafc; }
-.field-input:focus { border-color: #3b82f6; background: #fff; }
-.field-status { font-size: 12px; min-height: 18px; margin-bottom: 18px; }
-.btn-primary { width: 100%; padding: 14px; background: #1e5fa8; border: none; border-radius: 10px; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 8px; }
-.btn-primary:disabled { background: #a0b4cc; cursor: default; }
-.setup-note { margin-top: 20px; padding: 12px 14px; background: #f0f6ff; border-radius: 10px; font-size: 12px; color: #5a7a9a; line-height: 1.6; }
-.setup-note a { color: #1e5fa8; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a1628;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 0 2rem 0;
+    }
 
-#app { display: none; min-height: 100vh; flex-direction: column; max-width: 680px; margin: 0 auto; padding: 12px 12px 60px; }
-.app-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #1e5fa8; border-radius: 14px; margin-bottom: 14px; color: #fff; }
-.app-header h1 { font-size: 18px; font-weight: 700; flex: 1; }
-.app-header .sub { font-size: 11px; opacity: 0.7; }
-.settings-btn { background: rgba(255,255,255,0.2); border: none; border-radius: 8px; padding: 6px 10px; color: #fff; font-size: 12px; cursor: pointer; }
+    .pg-header {
+      width: 100%;
+      background: linear-gradient(160deg, #0C447C 0%, #042C53 100%);
+      padding: 2.5rem 1.5rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
 
-.tabs { display: flex; background: #fff; border-radius: 12px; padding: 4px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
-.tab { flex: 1; padding: 10px; border: none; background: transparent; border-radius: 9px; font-size: 14px; color: #6b7a90; cursor: pointer; font-weight: 500; }
-.tab.on { background: #1e5fa8; color: #fff; }
-.panel { display: none; } .panel.on { display: block; }
+    .pg-header svg.bg-lines {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      opacity: 0.10;
+    }
 
-#messages { background: #fff; border-radius: 14px; padding: 14px; min-height: 280px; max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
-.bubble { max-width: 86%; padding: 10px 14px; font-size: 14px; line-height: 1.65; white-space: pre-wrap; word-break: break-word; }
-.bubble.bot { align-self: flex-start; background: #f0f4f8; border-radius: 4px 14px 14px 14px; color: #1a2535; }
-.bubble.usr { align-self: flex-end; background: #1e5fa8; color: #fff; border-radius: 14px 4px 14px 14px; }
-.bubble-lbl { font-size: 10px; color: #8a96a8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.07em; }
+    .pg-logo-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
 
-.input-row { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 6px; }
-#mic-btn { width: 50px; height: 50px; border-radius: 50%; border: none; background: #1e5fa8; color: #fff; font-size: 20px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; touch-action: none; user-select: none; -webkit-user-select: none; transition: background 0.15s; }
-#mic-btn.rec { background: #e74c3c; box-shadow: 0 0 0 4px rgba(231,76,60,0.25); }
-#mic-btn.wait { background: #f0a500; cursor: wait; }
-#mic-btn.nokey { background: #a0b4cc; }
-#q { flex: 1; padding: 12px 14px; border: 1.5px solid #dde3ec; border-radius: 12px; font-size: 15px; resize: none; outline: none; line-height: 1.5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff; color: #1a2535; }
-#q:focus { border-color: #3b82f6; }
-#send-btn { width: 50px; height: 50px; border-radius: 50%; border: none; background: #e0e8f0; color: #8a96a8; font-size: 20px; cursor: default; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
-#send-btn.on { background: #1e5fa8; color: #fff; cursor: pointer; }
-#status-bar { font-size: 12px; color: #8a96a8; text-align: center; margin-bottom: 4px; }
-#voice-err { display: none; font-size: 13px; color: #c0392b; background: #fdf0ee; border: 1px solid #f5c6bf; border-radius: 10px; padding: 9px 13px; margin-bottom: 8px; }
+    .pg-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: #E6F1FB;
+      letter-spacing: 1px;
+    }
 
-.pol-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
-.pol-tab { flex: 1; padding: 10px; background: #fff; border: 1.5px solid #dde3ec; border-radius: 10px; font-size: 13px; cursor: pointer; color: #6b7a90; font-weight: 500; }
-.pol-tab.on { background: #1e5fa8; color: #fff; border-color: #1e5fa8; }
-#drop { border: 2px dashed #bdc8d8; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; margin-bottom: 10px; background: #f8fafc; transition: all 0.2s; }
-#drop.over { border-color: #1e5fa8; background: #e8f0fb; }
-#drop-txt { font-size: 14px; color: #6b7a90; }
-#drop-sub { font-size: 12px; color: #a0b4cc; margin-top: 4px; }
-#pol-ta { width: 100%; min-height: 240px; padding: 12px 14px; border: 1.5px solid #dde3ec; border-radius: 12px; font-size: 13px; font-family: monospace; line-height: 1.65; resize: vertical; outline: none; background: #fff; color: #1a2535; }
-#pol-ta:focus { border-color: #3b82f6; }
-#upload-err { display: none; font-size: 13px; color: #c0392b; background: #fdf0ee; border: 1px solid #f5c6bf; border-radius: 10px; padding: 9px 13px; margin-bottom: 8px; }
-.pol-hint { font-size: 11px; color: #a0b4cc; text-align: center; margin-top: 8px; }
+    .pg-subtitle {
+      font-size: 12px;
+      color: #85B7EB;
+      margin-top: 2px;
+    }
 
-@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
-</style>
+    .pg-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pg-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #5DCAA5;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .pg-status-text {
+      font-size: 12px;
+      color: #9FE1CB;
+    }
+
+    .pg-body {
+      width: 100%;
+      max-width: 480px;
+      padding: 1.25rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .pg-card {
+      background: #0f2040;
+      border-radius: 14px;
+      border: 1px solid #1a3a5c;
+      padding: 1rem 1.1rem;
+    }
+
+    .pg-section-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #85B7EB;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .pg-customer-select {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: 1px solid #1a3a5c;
+      background: #0a1628;
+      color: #E6F1FB;
+      font-size: 15px;
+      font-family: inherit;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2385B7EB' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+    }
+
+    .pg-customer-select option {
+      background: #0a1628;
+      color: #E6F1FB;
+    }
+
+    .pg-manuals {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .pg-manual-card {
+      background: #0a1628;
+      border-radius: 10px;
+      border: 1px solid #1a3a5c;
+      padding: 12px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .pg-manual-card.loaded {
+      border-color: #1D9E75;
+      background: #071a12;
+    }
+
+    .pg-manual-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #85B7EB;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pg-manual-status {
+      font-size: 11px;
+      color: #4a6a8a;
+    }
+
+    .pg-manual-card.loaded .pg-manual-status {
+      color: #5DCAA5;
+    }
+
+    .pg-search-input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pg-search-input {
+      flex: 1;
+      background: #0a1628;
+      border: 1px solid #1a3a5c;
+      border-radius: 10px;
+      padding: 11px 14px;
+      color: #E6F1FB;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+    }
+
+    .pg-search-input::placeholder {
+      color: #4a6a8a;
+    }
+
+    .pg-search-input:focus {
+      border-color: #378ADD;
+    }
+
+    .pg-mic-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #185FA5;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+
+    .pg-mic-btn:active {
+      background: #0C447C;
+      transform: scale(0.95);
+    }
+
+    .pg-mic-btn.listening {
+      background: #c0392b;
+      animation: micpulse 1s infinite;
+    }
+
+    @keyframes micpulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(192,57,43,0.5); }
+      50% { box-shadow: 0 0 0 8px rgba(192,57,43,0); }
+    }
+
+    .pg-search-btn {
+      width: 100%;
+      padding: 13px;
+      border-radius: 10px;
+      background: #185FA5;
+      color: #E6F1FB;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 10px;
+      letter-spacing: 0.3px;
+      transition: background 0.15s;
+    }
+
+    .pg-search-btn:active {
+      background: #0C447C;
+    }
+
+    .pg-result-area {
+      background: #0a1628;
+      border-radius: 10px;
+      border: 1px solid #1a3a5c;
+      padding: 16px;
+      min-height: 100px;
+    }
+
+    .pg-result-placeholder {
+      font-size: 13px;
+      color: #4a6a8a;
+      text-align: center;
+      padding: 1rem 0;
+    }
+
+    .pg-result-content {
+      font-size: 14px;
+      color: #E6F1FB;
+      line-height: 1.7;
+      display: none;
+    }
+
+    .pg-result-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .tag-company {
+      background: #0C447C;
+      color: #85B7EB;
+    }
+
+    .tag-customer {
+      background: #085041;
+      color: #5DCAA5;
+    }
+
+    .pg-footer {
+      width: 100%;
+      max-width: 480px;
+      padding: 0 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+
+    .pg-footer-text {
+      font-size: 11px;
+      color: #2a4a6a;
+    }
+  </style>
 </head>
 <body>
 
-<div id="setup">
-  <div class="setup-card">
-    <h1>⚖️ PolicyGuard</h1>
-    <p class="sub">Enter your API keys to get started. Saved to this device only.</p>
+  <div class="pg-header">
+    <svg class="bg-lines" viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <line x1="0" y1="40" x2="400" y2="40" stroke="white" stroke-width="1.5"/>
+      <line x1="0" y1="90" x2="400" y2="90" stroke="white" stroke-width="1.5"/>
+      <line x1="0" y1="130" x2="400" y2="130" stroke="white" stroke-width="1"/>
+      <line x1="70" y1="0" x2="70" y2="160" stroke="white" stroke-width="1.2"/>
+      <line x1="70" y1="40" x2="90" y2="0" stroke="white" stroke-width="1"/>
+      <line x1="70" y1="40" x2="50" y2="0" stroke="white" stroke-width="1"/>
+      <line x1="70" y1="90" x2="90" y2="40" stroke="white" stroke-width="1"/>
+      <line x1="70" y1="90" x2="50" y2="40" stroke="white" stroke-width="1"/>
+      <circle cx="70" cy="40" r="3" fill="white"/>
+      <circle cx="70" cy="90" r="3" fill="white"/>
+      <line x1="220" y1="0" x2="220" y2="160" stroke="white" stroke-width="1.2"/>
+      <line x1="220" y1="40" x2="240" y2="0" stroke="white" stroke-width="1"/>
+      <line x1="220" y1="40" x2="200" y2="0" stroke="white" stroke-width="1"/>
+      <line x1="220" y1="90" x2="240" y2="40" stroke="white" stroke-width="1"/>
+      <line x1="220" y1="90" x2="200" y2="40" stroke="white" stroke-width="1"/>
+      <circle cx="220" cy="40" r="3" fill="white"/>
+      <circle cx="220" cy="90" r="3" fill="white"/>
+      <line x1="370" y1="0" x2="370" y2="160" stroke="white" stroke-width="1.2"/>
+      <line x1="370" y1="40" x2="390" y2="0" stroke="white" stroke-width="1"/>
+      <line x1="370" y1="40" x2="350" y2="0" stroke="white" stroke-width="1"/>
+      <line x1="370" y1="90" x2="390" y2="40" stroke="white" stroke-width="1"/>
+      <line x1="370" y1="90" x2="350" y2="40" stroke="white" stroke-width="1"/>
+      <circle cx="370" cy="40" r="3" fill="white"/>
+      <circle cx="370" cy="90" r="3" fill="white"/>
+      <path d="M70 40 Q145 20 220 40" stroke="white" stroke-width="1" fill="none"/>
+      <path d="M220 40 Q295 20 370 40" stroke="white" stroke-width="1" fill="none"/>
+      <path d="M70 90 Q145 65 220 90" stroke="white" stroke-width="1" fill="none"/>
+      <path d="M220 90 Q295 65 370 90" stroke="white" stroke-width="1" fill="none"/>
+    </svg>
 
-    <div class="field-label">Anthropic API Key</div>
-    <div class="field-desc">Get yours at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys.</div>
-    <input id="s-ant" class="field-input" type="password" placeholder="sk-ant-..." autocapitalize="none" autocorrect="off" oninput="checkSetup()"/>
-    <div id="s-ant-status" class="field-status"></div>
-
-    <div class="field-label">Groq API Key <span style="font-weight:400;color:#a0b4cc;">(for voice)</span></div>
-    <div class="field-desc">Free at <a href="https://console.groq.com" target="_blank">console.groq.com</a> → API Keys.</div>
-    <input id="s-grq" class="field-input" type="password" placeholder="gsk_..." autocapitalize="none" autocorrect="off" oninput="checkSetup()"/>
-    <div id="s-grq-status" class="field-status"></div>
-
-    <button class="btn-primary" id="start-btn" onclick="startApp()" disabled>Enter Anthropic key to continue</button>
-    <div class="setup-note">🔒 Keys are saved to this browser only and go directly to the API — nothing else.</div>
-  </div>
-</div>
-
-<div id="app">
-  <div class="app-header">
-    <div><h1>⚖️ PolicyGuard</h1><div class="sub">Compliance Assistant</div></div>
-    <button class="settings-btn" onclick="goSettings()">⚙️ Keys</button>
-  </div>
-
-  <div class="tabs">
-    <button class="tab on" onclick="showTab('ask',this)">💬 Ask</button>
-    <button class="tab" onclick="showTab('pol',this)">📋 Policies</button>
-  </div>
-
-  <div id="ask" class="panel on">
-    <div id="messages"></div>
-    <div id="voice-err"></div>
-    <div class="input-row">
-      <button id="mic-btn" onpointerdown="startRec(event)" onpointerup="stopRec(event)" onpointerleave="stopRec(event)">🎤</button>
-      <textarea id="q" rows="2" placeholder="Type your question or hold mic to speak…" oninput="updSend()"></textarea>
-      <button id="send-btn" onclick="sendQ()">➤</button>
+    <div class="pg-logo-row">
+      <svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
+        <rect x="20" y="2" width="4" height="40" fill="#85B7EB" rx="1"/>
+        <rect x="8" y="12" width="28" height="3.5" fill="#85B7EB" rx="1"/>
+        <rect x="11" y="22" width="22" height="3.5" fill="#85B7EB" rx="1"/>
+        <circle cx="8" cy="13.75" r="3" fill="#5DCAA5"/>
+        <circle cx="36" cy="13.75" r="3" fill="#5DCAA5"/>
+        <circle cx="11" cy="23.75" r="3" fill="#5DCAA5"/>
+        <circle cx="33" cy="23.75" r="3" fill="#5DCAA5"/>
+        <path d="M8 13.75 Q22 7 36 13.75" stroke="#378ADD" stroke-width="1.2" fill="none"/>
+        <path d="M11 23.75 Q22 17 33 23.75" stroke="#378ADD" stroke-width="1.2" fill="none"/>
+      </svg>
+      <div>
+        <div class="pg-title">PolicyGuard</div>
+        <div class="pg-subtitle">Field Safety Policy Assistant</div>
+      </div>
     </div>
-    <div id="status-bar">Ready</div>
+
+    <div class="pg-status">
+      <div class="pg-status-dot"></div>
+      <div class="pg-status-text">System ready</div>
+    </div>
   </div>
 
-  <div id="pol" class="panel">
-    <div class="pol-tabs">
-      <button class="pol-tab on" onclick="showPol('own',this)">🏢 Our company</button>
-      <button class="pol-tab" onclick="showPol('cust',this)">🤝 Customer</button>
+  <div class="pg-body">
+
+    <div class="pg-card">
+      <div class="pg-section-label">Select customer</div>
+      <select class="pg-customer-select" id="customerSelect">
+        <option value="">— Choose a customer —</option>
+        <option value="customer1">Customer 1</option>
+        <option value="customer2">Customer 2</option>
+        <option value="customer3">Customer 3</option>
+        <option value="customer4">Customer 4</option>
+      </select>
     </div>
-    <div id="drop" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="onDrop(event)" onclick="document.getElementById('fi').click()">
-      <input id="fi" type="file" accept=".pdf,.docx,.txt" style="display:none" onchange="onFileIn(event)"/>
-      <div id="drop-txt">📄 Tap to upload your policy manual</div>
-      <div id="drop-sub">PDF · DOCX · TXT</div>
+
+    <div class="pg-card">
+      <div class="pg-section-label">Policy manuals</div>
+      <div class="pg-manuals">
+        <div class="pg-manual-card" id="companyManualCard">
+          <div class="pg-manual-title">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <rect x="2" y="1" width="10" height="13" rx="1" stroke="#85B7EB" stroke-width="1.2"/>
+              <path d="M5 5h6M5 8h6M5 11h4" stroke="#85B7EB" stroke-width="1" stroke-linecap="round"/>
+            </svg>
+            Company
+          </div>
+          <div class="pg-manual-status" id="companyStatus">No file loaded</div>
+        </div>
+        <div class="pg-manual-card" id="customerManualCard">
+          <div class="pg-manual-title">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <rect x="2" y="1" width="10" height="13" rx="1" stroke="#85B7EB" stroke-width="1.2"/>
+              <path d="M5 5h6M5 8h6M5 11h4" stroke="#85B7EB" stroke-width="1" stroke-linecap="round"/>
+            </svg>
+            Customer
+          </div>
+          <div class="pg-manual-status" id="customerStatus">No file loaded</div>
+        </div>
+      </div>
     </div>
-    <div id="upload-err"></div>
-    <textarea id="pol-ta" oninput="polChange()"></textarea>
-    <div class="pol-hint">Upload a file or edit directly — used in all queries immediately</div>
+
+    <div class="pg-card">
+      <div class="pg-section-label">Policy search</div>
+      <div class="pg-search-input-row">
+        <input class="pg-search-input" type="text" id="searchInput" placeholder='Try "grounding" or "lockout"' />
+        <button class="pg-mic-btn" id="micBtn" title="Tap to speak">
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
+            <rect x="5" y="1" width="6" height="8" rx="3" fill="#E6F1FB"/>
+            <path d="M2 8c0 3.3 2.7 6 6 6s6-2.7 6-6" stroke="#E6F1FB" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            <line x1="8" y1="14" x2="8" y2="16" stroke="#E6F1FB" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <button class="pg-search-btn" id="searchBtn">Search policies</button>
+    </div>
+
+    <div class="pg-card">
+      <div class="pg-section-label">Results</div>
+      <div class="pg-result-area">
+        <div class="pg-result-placeholder" id="resultPlaceholder">Search results will appear here</div>
+        <div class="pg-result-content" id="resultContent"></div>
+      </div>
+    </div>
+
   </div>
-</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-<script>
-// Use corsproxy.io to bypass Edge local file CORS restriction
-var ANTHROPIC_PROXY = 'https://corsproxy.io/?' + encodeURIComponent('https://api.anthropic.com/v1/messages');
-var GROQ_PROXY = 'https://api.groq.com/openai/v1/audio/transcriptions'; // Groq already allows CORS
+  <div class="pg-footer">
+    <div class="pg-footer-text">PolicyGuard — Field Edition v1.0</div>
+    <div class="pg-footer-text">Stage 1</div>
+  </div>
 
-var S = {
-  antKey: '', grqKey: '',
-  own: 'COMPANY POLICIES & PROCEDURES\n\n1. CONFIDENTIALITY\nAll employee and client data must be kept strictly confidential. Do not share proprietary information with unauthorized parties.\n\n2. WORKPLACE CONDUCT\nEmployees must maintain professional conduct at all times. Harassment or hostile behavior will not be tolerated.\n\n3. DATA SECURITY\nAll company devices must use approved security software. Never store sensitive data on personal devices.\n\n4. EXPENSE REPORTING\nAll expenses over $50 must be pre-approved by a manager. Receipts are required for all reimbursements.\n\n5. CONFLICT OF INTEREST\nEmployees must disclose any personal relationships that could influence business decisions.\n\n6. REMOTE WORK\nEmployees working remotely must use a VPN at all times.',
-  cust: 'CUSTOMER POLICY MANUAL\n\n1. ON-SITE REQUIREMENTS\nAll contractors must sign in and wear a visible badge at all times.\n\n2. PHOTOGRAPHY & RECORDING\nNo photos or recordings may be taken on customer property without written consent.\n\n3. SYSTEM ACCESS\nContractors may only access systems authorized in the current Statement of Work.\n\n4. COMMUNICATION PROTOCOL\nAll scope changes must go through the designated customer project manager.\n\n5. SAFETY REQUIREMENTS\nHard hats and safety vests are required in all warehouse and production areas.\n\n6. INTELLECTUAL PROPERTY\nAll work product created on-site becomes the property of the customer.',
-  polTab: 'own', micState: 'idle', recSecs: 0, recorder: null, chunks: [], timer: null
-};
+  <script>
+    const micBtn = document.getElementById('micBtn');
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const resultPlaceholder = document.getElementById('resultPlaceholder');
+    const resultContent = document.getElementById('resultContent');
 
-(function(){
-  try {
-    var ak = localStorage.getItem('pg4_ant');
-    var gk = localStorage.getItem('pg4_grq');
-    if (ak) { S.antKey = ak; document.getElementById('s-ant').value = ak; }
-    if (gk) { S.grqKey = gk; document.getElementById('s-grq').value = gk; }
-    checkSetup();
-    if (ak) startApp();
-  } catch(e) {}
-})();
+    let recognition = null;
+    let isListening = false;
 
-function checkSetup() {
-  var ak = document.getElementById('s-ant').value.trim();
-  var gk = document.getElementById('s-grq').value.trim();
-  var as = document.getElementById('s-ant-status');
-  var gs = document.getElementById('s-grq-status');
-  var btn = document.getElementById('start-btn');
-  if (!ak) { as.textContent = ''; }
-  else if (ak.startsWith('sk-')) { as.style.color='#27ae60'; as.textContent='✓ Key looks good'; }
-  else { as.style.color='#e74c3c'; as.textContent='Should start with sk-ant-...'; }
-  if (!gk) { gs.textContent = ''; }
-  else if (gk.startsWith('gsk_')) { gs.style.color='#27ae60'; gs.textContent='✓ Voice enabled'; }
-  else { gs.style.color='#e74c3c'; gs.textContent='Should start with gsk_'; }
-  if (ak && ak.startsWith('sk-')) { btn.disabled=false; btn.textContent='Launch PolicyGuard →'; }
-  else { btn.disabled=true; btn.textContent='Enter Anthropic key to continue'; }
-}
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
 
-function startApp() {
-  var ak = document.getElementById('s-ant').value.trim();
-  var gk = document.getElementById('s-grq').value.trim();
-  if (!ak) return;
-  S.antKey = ak; S.grqKey = gk;
-  try { localStorage.setItem('pg4_ant', ak); if(gk) localStorage.setItem('pg4_grq', gk); } catch(e) {}
-  document.getElementById('setup').style.display = 'none';
-  document.getElementById('app').style.display = 'flex';
-  document.getElementById('pol-ta').value = S.own;
-  updMic();
-  addBot('Hello! I\'m your Policy Assistant. Ask me anything about your company or customer policies.\n\n' + (S.grqKey ? '🎤 Hold the mic button to speak.' : '🎤 Add a Groq key via ⚙️ Keys to enable voice.'));
-}
+      recognition.onresult = function(e) {
+        const transcript = e.results[0][0].transcript;
+        searchInput.value = transcript;
+        stopListening();
+      };
 
-function goSettings() {
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('setup').style.display = 'flex';
-}
+      recognition.onerror = function() { stopListening(); };
+      recognition.onend = function() { stopListening(); };
+    }
 
-function showTab(id, btn) {
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
-  btn.classList.add('on'); document.getElementById(id).classList.add('on');
-}
+    function stopListening() {
+      isListening = false;
+      micBtn.classList.remove('listening');
+    }
 
-function showPol(id, btn) {
-  S.polTab = id;
-  document.querySelectorAll('.pol-tab').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  document.getElementById('pol-ta').value = S[id];
-}
-function polChange() { S[S.polTab] = document.getElementById('pol-ta').value; }
-
-function addBot(txt) {
-  var m = document.getElementById('messages');
-  var w = document.createElement('div'); w.className = 'bubble bot';
-  var l = document.createElement('div'); l.className = 'bubble-lbl'; l.textContent = '⚖️ PolicyGuard';
-  var t = document.createElement('div'); t.textContent = txt;
-  w.appendChild(l); w.appendChild(t); m.appendChild(w); m.scrollTop = m.scrollHeight;
-}
-function addUsr(txt) {
-  var m = document.getElementById('messages');
-  var b = document.createElement('div'); b.className = 'bubble usr'; b.textContent = txt;
-  m.appendChild(b); m.scrollTop = m.scrollHeight;
-}
-function addThinking() {
-  var m = document.getElementById('messages');
-  var b = document.createElement('div'); b.className = 'bubble bot'; b.id = 'thinking';
-  var l = document.createElement('div'); l.className = 'bubble-lbl'; l.textContent = '⚖️ PolicyGuard';
-  var t = document.createElement('div'); t.textContent = 'Reviewing policies…'; t.style.animation = 'pulse 1.2s infinite'; t.style.color = '#8a96a8';
-  b.appendChild(l); b.appendChild(t); m.appendChild(b); m.scrollTop = m.scrollHeight;
-}
-function removeThinking() { var t = document.getElementById('thinking'); if(t) t.remove(); }
-
-function updSend() {
-  var s = document.getElementById('send-btn');
-  document.getElementById('q').value.trim() ? s.classList.add('on') : s.classList.remove('on');
-}
-function setVoiceErr(msg) {
-  var el = document.getElementById('voice-err');
-  if (msg) { el.textContent = msg; el.style.display = 'block'; }
-  else { el.style.display = 'none'; }
-}
-function updStatus() {
-  var el = document.getElementById('status-bar');
-  if (S.micState === 'recording') el.textContent = '🔴 Recording ' + S.recSecs + 's — release to transcribe';
-  else if (S.micState === 'transcribing') el.textContent = '⏳ Transcribing…';
-  else if (S.grqKey) el.textContent = 'Hold mic to speak · Enter to send';
-  else el.textContent = 'Ready — type your question and tap ➤';
-}
-
-document.getElementById('q').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendQ(); }
-});
-
-async function callAnthropic(body) {
-  // Try direct first, fall back to proxy if blocked
-  try {
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': S.antKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-allow-browser': 'true' },
-      body: JSON.stringify(body)
+    micBtn.addEventListener('click', function() {
+      if (!recognition) {
+        alert('Voice input is not supported in this browser. Please type your search.');
+        return;
+      }
+      if (isListening) {
+        recognition.stop();
+        stopListening();
+      } else {
+        recognition.start();
+        isListening = true;
+        micBtn.classList.add('listening');
+      }
     });
-    if (res.ok || res.status < 500) return await res.json();
-    throw new Error('Direct failed');
-  } catch(e) {
-    // Fall back to corsproxy
-    var res2 = await fetch(ANTHROPIC_PROXY, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': S.antKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-allow-browser': 'true' },
-      body: JSON.stringify(body)
+
+    searchBtn.addEventListener('click', function() {
+      const query = searchInput.value.trim();
+      if (!query) {
+        alert('Please enter a search term.');
+        return;
+      }
+      resultPlaceholder.style.display = 'none';
+      resultContent.style.display = 'block';
+      resultContent.innerHTML = '<p style="color:#85B7EB; font-size:13px;">PDF upload and AI search coming in Stage 2...</p>';
     });
-    return await res2.json();
-  }
-}
+  </script>
 
-async function sendQ() {
-  var q = document.getElementById('q').value.trim();
-  if (!q || !S.antKey) return;
-  addUsr(q);
-  document.getElementById('q').value = '';
-  updSend(); setVoiceErr('');
-  addThinking();
-  try {
-    var data = await callAnthropic({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      system: 'You are a compliance and policy assistant.\n\n== OWN COMPANY POLICY ==\n' + S.own + '\n\n== CUSTOMER POLICY ==\n' + S.cust + '\n\nWhen answering: identify which policy applies, cite the section by number, give a clear plain-English verdict (Allowed / Prohibited / Requires Approval). Be concise. If not covered, say so.',
-      messages: [{ role: 'user', content: q }]
-    });
-    removeThinking();
-    if (data.error) addBot('Error: ' + data.error.message);
-    else addBot((data.content || []).map(b => b.text || '').join('') || 'No response.');
-  } catch(err) {
-    removeThinking();
-    addBot('Connection error: ' + err.message);
-  }
-  updStatus();
-}
-
-async function startRec(e) {
-  e.preventDefault();
-  if (S.micState !== 'idle') return;
-  if (!S.grqKey) { setVoiceErr('No Groq key — tap ⚙️ Keys to add one for voice.'); return; }
-  setVoiceErr('');
-  try {
-    var stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    S.chunks = [];
-    var mime = MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4'
-      : MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm';
-    var rec = new MediaRecorder(stream, { mimeType: mime });
-    rec.ondataavailable = function(ev) { if (ev.data.size > 0) S.chunks.push(ev.data); };
-    rec.onstop = async function() {
-      stream.getTracks().forEach(t => t.stop());
-      clearInterval(S.timer);
-      S.micState = 'transcribing'; updMic(); updStatus();
-      try {
-        var blob = new Blob(S.chunks, { type: mime });
-        var txt = await transcribe(blob, mime);
-        document.getElementById('q').value = txt.trim();
-        updSend();
-      } catch(err) { setVoiceErr('Transcription failed: ' + err.message); }
-      S.micState = 'idle'; updMic(); updStatus();
-    };
-    rec.start(100);
-    S.recorder = rec; S.micState = 'recording'; S.recSecs = 0;
-    S.timer = setInterval(function() { S.recSecs++; updStatus(); }, 1000);
-    updMic(); updStatus();
-  } catch(err) {
-    setVoiceErr('Microphone access denied. Click the lock icon in the address bar → Microphone → Allow, then refresh.');
-  }
-}
-function stopRec(e) {
-  e.preventDefault();
-  if (S.micState !== 'recording') return;
-  if (S.recorder && S.recorder.state !== 'inactive') S.recorder.stop();
-}
-function updMic() {
-  var b = document.getElementById('mic-btn');
-  b.className = '';
-  if (S.micState === 'recording') { b.textContent = '⏹'; b.className = 'rec'; }
-  else if (S.micState === 'transcribing') { b.textContent = '⏳'; b.className = 'wait'; }
-  else if (!S.grqKey) { b.textContent = '🎤'; b.className = 'nokey'; }
-  else { b.textContent = '🎤'; }
-  b.id = 'mic-btn';
-}
-async function transcribe(blob, mime) {
-  var ext = mime.includes('mp4') ? 'audio.mp4' : mime.includes('webm') ? 'audio.webm' : 'audio.m4a';
-  var fd = new FormData();
-  fd.append('file', blob, ext);
-  fd.append('model', 'whisper-large-v3-turbo');
-  fd.append('language', 'en');
-  var res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
-    method: 'POST', headers: { 'Authorization': 'Bearer ' + S.grqKey }, body: fd
-  });
-  if (!res.ok) { var e = await res.json().catch(()=>({})); throw new Error(e?.error?.message || 'HTTP ' + res.status); }
-  return (await res.json()).text || '';
-}
-
-function onDrop(e) { e.preventDefault(); document.getElementById('drop').classList.remove('over'); handleFile(e.dataTransfer.files[0]); }
-function onFileIn(e) { handleFile(e.target.files[0]); e.target.value = ''; }
-async function handleFile(file) {
-  if (!file) return;
-  var n = file.name.toLowerCase();
-  if (!n.endsWith('.pdf') && !n.endsWith('.docx') && !n.endsWith('.txt')) { showUpErr('Please upload a PDF, DOCX, or TXT file.'); return; }
-  document.getElementById('upload-err').style.display = 'none';
-  document.getElementById('drop-txt').textContent = '⏳ Extracting text…';
-  document.getElementById('drop-sub').textContent = '';
-  try {
-    var txt = '';
-    if (n.endsWith('.pdf')) txt = await exPDF(file);
-    else if (n.endsWith('.docx')) txt = await exDocx(file);
-    else txt = await exTxt(file);
-    S[S.polTab] = txt;
-    document.getElementById('pol-ta').value = txt;
-    document.getElementById('drop-txt').textContent = '✅ ' + file.name;
-    document.getElementById('drop-sub').textContent = 'Tap to replace';
-  } catch(err) {
-    showUpErr('Failed: ' + err.message);
-    document.getElementById('drop-txt').textContent = '📄 Tap to upload your policy manual';
-    document.getElementById('drop-sub').textContent = 'PDF · DOCX · TXT';
-  }
-}
-function showUpErr(m) { var e = document.getElementById('upload-err'); e.textContent = '⚠️ ' + m; e.style.display = 'block'; }
-
-async function exPDF(file) {
-  return new Promise(function(res, rej) {
-    var r = new FileReader();
-    r.onload = async function(e) {
-      try {
-        var b64 = e.target.result.split(',')[1];
-        var data = await callAnthropic({ model: 'claude-sonnet-4-20250514', max_tokens: 4000, messages: [{ role: 'user', content: [{ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } }, { type: 'text', text: 'Extract all text from this policy document. Return only raw text preserving structure. No commentary.' }] }] });
-        res((data.content || []).map(b => b.text || '').join(''));
-      } catch(err) { rej(err); }
-    };
-    r.onerror = rej; r.readAsDataURL(file);
-  });
-}
-async function exDocx(file) {
-  return new Promise(function(res, rej) {
-    var r = new FileReader();
-    r.onload = async function(e) { try { var result = await mammoth.extractRawText({ arrayBuffer: e.target.result }); res(result.value); } catch(err) { rej(err); } };
-    r.onerror = rej; r.readAsArrayBuffer(file);
-  });
-}
-async function exTxt(file) {
-  return new Promise(function(res, rej) { var r = new FileReader(); r.onload = e => res(e.target.result); r.onerror = rej; r.readAsText(file); });
-}
-</script>
 </body>
 </html>
